@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import API from "../api/api";
-
-
 export default function Dashboard() {
 
   const [logs, setLogs] = useState([]);
@@ -146,7 +144,7 @@ return (
           Progress Chart
         </h2>
 
-        <div className="w-full h-[250px] sm:h-[300px]">
+        <div className="w-full h-62.5 sm:h-75">
 
           <ResponsiveContainer width="100%" height="100%">
 

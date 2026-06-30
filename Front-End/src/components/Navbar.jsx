@@ -1,21 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Navbar() {
-
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
+  const { user, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
 
   return (
 
-    <nav className="bg-gradient-to-right from-orange-400 to-orange-600 shadow-md fixed w-full top-0 left-0 z-50">
+    <nav className="bg-gradient-to-r from-blue-400 to-indigo-600 shadow-md fixed w-full top-0 left-0 z-50">
 
       <div className="max-w-7xl mx-auto px-4 py-3">
 
@@ -26,7 +25,7 @@ export default function Navbar() {
             to="/"
             className="text-white font-bold text-xl"
           >
-            HabitTracker
+            Trackify
           </Link>
 
          
@@ -45,7 +44,7 @@ export default function Navbar() {
               Habits
             </Link>
 
-            {!token ? (
+            {!user ? (
               <>
                 <Link
                   to="/login"
@@ -62,12 +61,23 @@ export default function Navbar() {
                 </Link>
               </>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="bg-red-900 text-white px-4 py-1 rounded"
-              >
-                Logout
-              </button>
+              <div className="flex items-center gap-4">
+                <div className="text-white text-sm">
+                  Hi, {user.name || user.email}
+                </div>
+                <Link
+                  to="/profile"
+                  className="text-white hover:text-gray-200"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 text-white px-4 py-1 rounded"
+                >
+                  Logout
+                </button>
+              </div>
             )}
 
           </div>
@@ -102,7 +112,7 @@ export default function Navbar() {
               Habits
             </Link>
 
-            {!token ? (
+            {!user ? (
               <>
                 <Link
                   to="/login"
@@ -121,12 +131,22 @@ export default function Navbar() {
                 </Link>
               </>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="bg-red-900 text-white px-4 py-2 rounded w-fit"
-              >
-                Logout
-              </button>
+              <div className="space-y-3">
+                <div className="text-white">Hi, {user.name || user.email}</div>
+                <Link
+                  to="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-white"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 text-white px-4 py-2 rounded w-fit"
+                >
+                  Logout
+                </button>
+              </div>
             )}
 
           </div>
