@@ -1,48 +1,74 @@
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+import structlog
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
 
-from app.database import engine
-from app import models
-from app.routers import auth, streaks, schema, reservations, users
+from app.config import get_settings
+from app.database import Base, engine
+from app.logging_config import configure_logging
+from app.middleware import LoggingMiddleware
+from app.routers import completions, habits
 
-load_dotenv()
+settings = get_settings()
+logger = structlog.get_logger()
 
-# Create all database tables on startup
-models.Base.metadata.create_all(bind=engine)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events."""
+    # Startup
+    configure_logging(json_format=not settings.debug)
+    logger.info("Starting Habit Tracker API", debug=settings.debug)
+
+    # Create database tables
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down Habit Tracker API")
+
 
 app = FastAPI(
-    title       = "Habit Tracker System — API",
-    description = "Panic coders | Hackathon Full-Stack Project",
-    version     = "1.0.0",
+    title=settings.app_name,
+    description="A simple habit tracking API",
+    version="0.1.0",
+    lifespan=lifespan,
 )
 
 
+# Exception handlers
+@app.exception_handler(AppException)
+async def app_exception_handler(request: Request, exc: AppException):
+    """Handle custom application exceptions."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.error_code,
+            "detail": exc.detail,
+        },
+    )
+
+
+# Middleware (order matters - last added = first executed)
+app.add_middleware(LoggingMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins     = ["http://localhost:3000", "http://localhost:5173", "*"],
-    allow_credentials = True,
-    allow_methods     = ["*"],
-    allow_headers     = ["*"],
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allow_headers=["*"],
 )
 
-
-app.include_router(auth.router)
-app.include_router(menu.router)
-app.include_router(tables.router)
-app.include_router(reservations.router)
-app.include_router(admin.router)
+# Routers
+app.include_router(habits.router, prefix="/api")
+app.include_router(completions.router, prefix="/api")
 
 
-@app.get("/", tags=["Health"])
-def root():
-    return {
-        "status"  : "ok",
-        "message" : "Habit Tracker API is running",
-        "docs"    : "/docs",
-    }
-
-
-@app.get("/health", tags=["Health"])
-def health():
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
     return {"status": "healthy"}
