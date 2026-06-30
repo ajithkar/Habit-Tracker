@@ -3,11 +3,9 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
-import Container from "../components/ui/Container";
 
 function Login() {
   const navigate = useNavigate();
