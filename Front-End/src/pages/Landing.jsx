@@ -8,12 +8,12 @@ export default function Landing() {
       <section className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-            Build Better Habits
+            Trackify: Your Habit Tracker with Streaks
           </h1>
           
           <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Track your daily habits, maintain streaks, and achieve your goals with our intuitive habit tracker.
-            Stay consistent and watch your progress grow.
+           Track your habits and achieve your goals with Trackify.
+                Our app helps you stay on track and build positive habits for a better life.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
