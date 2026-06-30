@@ -1,127 +1,195 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
-import Container from "../components/ui/Container";
+import { useState, useContext } from "react";
+import API from "../api/api";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
+
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-  const onSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
     try {
-      setLoading(true);
-      setServerError("");
 
-      const response = await loginUser(data);
-      login(response);
+      const res = await API.post("/auth/login", form);
 
-      if (response.data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/customer/dashboard");
-      }
-    } catch (error) {
-      setServerError(
-        error.response?.data?.message || "Login failed"
+      login(res.data);
+
+      navigate("/");
+
+    } catch (err) {
+
+      setError(
+        err.response?.data?.message || "Login failed"
       );
-    } finally {
-      setLoading(false);
+
+      setTimeout(() => setError(""), 3000);
     }
   };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <Container className="max-w-md">
-        <div className="bg-white p-8 rounded-2xl shadow-md">
 
-          {/* Title */}
-          <h2 className="text-3xl font-bold text-center text-red-900">
-            Welcome Back
-          </h2>
+    <div className="
+      min-h-[calc(100vh-64px)]
+      flex
+      items-center
+      justify-center
+      px-4
+      sm:px-6
+      lg:px-8
+      py-6
+    ">
 
-          <p className="text-center text-gray-500 mt-2 mb-6">
-            Login to your account
-          </p>
+      <div className="
+        w-full
+        max-w-md
+        bg-white
+        shadow-xl
+        rounded-2xl
+        p-6
+        sm:p-8
+        border
+        border-gray-200
+      ">
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Heading */}
+        <h2 className="
+          text-2xl
+          sm:text-3xl
+          font-bold
+          text-center
+          text-gray-800
+          mb-6
+        ">
+          Welcome Back
+        </h2>
 
-            {/* Email */}
-            <Input
-              label="Email"
-              type="email"
-              placeholder="Enter your email"
-              register={register("email", {
-                required: "Email is required",
-              })}
-              error={errors.email}
-            />
+        {/* Error */}
+        {error && (
+          <div className="
+            bg-red-100
+            text-red-600
+            px-3
+            py-2
+            rounded-lg
+            mb-4
+            text-sm
+            text-center
+          ">
+            {error}
+          </div>
+        )}
 
-            {/* Password */}
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                register={register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Minimum 6 characters required",
-                  },
-                })}
-                error={errors.password}
-              />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-              {/* Toggle Password */}
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-10 text-gray-500"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
+          {/* Email */}
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              rounded-lg
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-500
+              transition
+            "
+            value={form.email}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+              })
+            }
+          />
 
-            {serverError && (
-              <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4">
-                {serverError}
-              </div>
-            )}
+          {/* Password */}
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              rounded-lg
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-500
+              transition
+            "
+            value={form.password}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                password: e.target.value,
+              })
+            }
+          />
 
-            {/* Button */}
-            <Button type="submit" loading={loading} className="w-full">
-              Login
-            </Button>
+          {/* Button */}
+          <button
+            type="submit"
+            className="
+              w-full
+              bg-gradient-to-right
+              from-blue-600
+              to-indigo-600
+              text-white
+              py-3
+              rounded-lg
+              font-semibold
+              hover:scale-[1.02]
+              active:scale-[0.98]
+              transition
+              duration-200
+            "
+          >
+            Login
+          </button>
 
-          </form>
+        </form>
 
-          {/* Register link */}
-          <p className="text-center text-sm mt-5 text-gray-600">
-            Don’t have an account?{" "}
-            <Link to="/register" className="text-red-900 font-semibold">
-              Register
-            </Link>
-          </p>
+        {/* Footer */}
+        <p className="
+          text-center
+          mt-5
+          text-gray-600
+          text-sm
+        ">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="
+              text-blue-600
+              font-semibold
+              hover:underline
+            "
+          >
+            Register
+          </Link>
+        </p>
 
-        </div>
-      </Container>
+      </div>
+
     </div>
+
   );
 }
 
