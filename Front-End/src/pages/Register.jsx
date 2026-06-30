@@ -1,168 +1,239 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
-import { registerUser } from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import API from "../api/api";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
-  const password = watch("password");
 
-  const onSubmit = async (data) => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
     try {
-      setLoading(true);
-      setServerError("");
 
-      await registerUser(data);
+      await API.post("/auth/register", form);
 
-      navigate("/login");
-    } catch (error) {
-      setServerError(
-        error.response?.data?.message ||
+      setSuccess("Account created successfully!");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (err) {
+
+      setError(
+        err.response?.data?.message ||
         "Registration failed"
       );
-    } finally {
-      setLoading(false);
+
+      setTimeout(() => setError(""), 3000);
     }
   };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12">
-      <Container className="max-w-lg">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
 
-          <h1 className="text-3xl font-bold text-center text-red-900">
-            Create Account
-          </h1>
+    <div className="
+      min-h-[calc(100vh-64px)]
+      flex
+      items-center
+      justify-center
+      px-4
+      sm:px-6
+      lg:px-8
+      py-6
+    ">
 
-          <p className="text-center text-gray-500 mt-2 mb-8">
-            Join us and reserve your favorite table.
-          </p>
+      <div className="
+        w-full
+        max-w-md
+        bg-white
+        shadow-xl
+        rounded-2xl
+        p-6
+        sm:p-8
+        border
+        border-gray-200
+      ">
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Heading */}
+        <h2 className="
+          text-2xl
+          sm:text-3xl
+          font-bold
+          text-center
+          text-gray-800
+          mb-6
+        ">
+          Create Account
+        </h2>
 
-            <Input
-              label="Full Name"
-              placeholder="John Doe"
-              register={register("full_name", {
-                required: "Full name is required",
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters",
-                },
-              })}
-              error={errors.full_name}
-            />
+        {/* Error Message */}
+        {error && (
+          <div className="
+            bg-red-100
+            text-red-600
+            px-3
+            py-2
+            rounded-lg
+            mb-4
+            text-sm
+            text-center
+          ">
+            {error}
+          </div>
+        )}
 
-            <Input
-              label="Email"
-              type="email"
-              placeholder="example@gmail.com"
-              register={register("email", {
-                required: "Email is required",
-                pattern: {
-                  value:
-                    /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
-                },
-              })}
-              error={errors.email}
-            />
+        {/* Success Message */}
+        {success && (
+          <div className="
+            bg-green-100
+            text-green-600
+            px-3
+            py-2
+            rounded-lg
+            mb-4
+            text-sm
+            text-center
+          ">
+            {success}
+          </div>
+        )}
 
-            {/* Password */}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-            <div className="relative">
+          {/* Name */}
+          <input
+            type="text"
+            placeholder="Full Name"
+            required
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              rounded-lg
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green-500
+              transition
+            "
+            value={form.name}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                name: e.target.value,
+              })
+            }
+          />
 
-              <Input
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="********"
-                register={register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Minimum 6 characters",
-                  },
-                })}
-                error={errors.password}
-              />
+          {/* Email */}
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              rounded-lg
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green-500
+              transition
+            "
+            value={form.email}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+              })
+            }
+          />
 
-              <button
-                type="button"
-                className="absolute right-3 top-10"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+          {/* Password */}
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              rounded-lg
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green-500
+              transition
+            "
+            value={form.password}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                password: e.target.value,
+              })
+            }
+          />
 
-            </div>
+          {/* Button */}
+          <button
+            type="submit"
+            className="
+              w-full
+              bg-gradient-to-right
+              from-green-600
+              to-teal-600
+              text-white
+              py-3
+              rounded-lg
+              font-semibold
+              hover:scale-[1.02]
+              active:scale-[0.98]
+              transition
+              duration-200
+            "
+          >
+            Register
+          </button>
 
-            {/* Confirm Password */}
+        </form>
 
-            <div className="relative">
+        {/* Footer */}
+        <p className="
+          text-center
+          mt-5
+          text-gray-600
+          text-sm
+        ">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="
+              text-green-600
+              font-semibold
+              hover:underline
+            "
+          >
+            Login
+          </Link>
+        </p>
 
-              <Input
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="********"
-                register={register("confirmPassword", {
-                  required: "Confirm your password",
-                  validate: (value) =>
-                    value === password || "Passwords do not match",
-                })}
-                error={errors.confirmPassword}
-              />
+      </div>
 
-              <button
-                type="button"
-                className="absolute right-3 top-10"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
-              >
-                {showConfirmPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
-
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full mt-4"
-            >
-              Register
-            </Button>
-
-          </form>
-
-          <p className="text-center mt-6 text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-red-900 font-semibold"
-            >
-              Login
-            </Link>
-          </p>
-
-        </div>
-      </Container>
     </div>
+
   );
 }
 
