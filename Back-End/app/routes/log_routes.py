@@ -7,7 +7,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.core.database import habits_collection, logs_collection
 from app.core.deps import get_current_user_id
-from app.schemas.log_schema import LogCreate
+from app.schemas.log_schemas import LogCreate
 from app.utils.serializers import serialize_doc
 
 router = APIRouter(prefix="/api/logs", tags=["Logs"])

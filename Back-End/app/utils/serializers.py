@@ -1,5 +1,5 @@
 def serialize_doc(doc: dict) -> dict:
-    """Convert a MongoDB document into a JSON-friendly dict with string ids."""
+   
     if not doc:
         return doc
 
