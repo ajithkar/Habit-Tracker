@@ -28,3 +28,4 @@ async def on_startup():
 @app.get("/")
 async def root():
     return {"message": "Habit Tracker API is running"}
+
