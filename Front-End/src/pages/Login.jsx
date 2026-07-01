@@ -148,9 +148,9 @@ function Login() {
             type="submit"
             className="
               w-full
-              bg-gradient-to-r
-              from-yellow-600
-              to-orange-600
+              bg-gradient-to-right
+              from-blue-600
+              to-indigo-600
               text-white
               py-3
               rounded-lg

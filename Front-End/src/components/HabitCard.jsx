@@ -5,7 +5,7 @@ function HabitCard({habit,onDelete,onComplete,onEdit,onHistory,}) {
     <div className="bg-gray-800 p-4 sm:p-5 rounded-lg shadow-md hover:shadow-xl transition duration-300">
 
       {/* Title */}
-      <h3 className="text-lg sm:text-xl font-bold text-white mb-1 break-word">
+      <h3 className="text-lg sm:text-xl font-bold text-white mb-1 break-words">
         {habit.title}
       </h3>
 
@@ -13,7 +13,7 @@ function HabitCard({habit,onDelete,onComplete,onEdit,onHistory,}) {
       {/* Description */}
       {habit.description && (
 
-        <p className="text-gray-400 mb-2 text-sm sm:text-base break-word">
+        <p className="text-gray-400 mb-2 text-sm sm:text-base break-words">
           {habit.description}
         </p>
 

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://habit-tracker-backend-qsiv.onrender.com/api",
-});
+  baseURL: "http://localhost:5173",});
 
 API.interceptors.request.use((req) => {
 
